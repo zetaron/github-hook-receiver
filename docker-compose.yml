@@ -7,14 +7,12 @@ services:
       - queue:/data
     networks:
       - backend
-  github-receive:
-    build:
-      context: .
-      dockerfile: Dockerfile.onbuild
+  github-hook-receiver:
+    image: zetaron/github-hook-receiver:1.0.0
+    volumes:
+      - secrets:/var/cache/secrets:ro
     depends_on:
       - queue
-    env_file:
-      - github-secret.env
     environment:
       - REDIS_URL=queue:6379
     networks:
@@ -28,6 +26,9 @@ services:
 volumes:
   queue:
     driver: local
+  secrets:
+    external:
+      name: github-hook-receiver-secrets
 
 networks:
   backend:
