@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+  queue:
+    image: redis:3.2.5-alpine
+    volumes:
+      - queue:/data
+    networks:
+      - backend
+  github-receive:
+    build:
+      context: .
+      dockerfile: Dockerfile.onbuild
+    depends_on:
+      - queue
+    env_file:
+      - github-secret.env
+    environment:
+      - REDIS_URL=queue:6379
+    networks:
+      - frontends
+      - backend
+    labels:
+      - "ingress=true"
+      - "ingress.dnsname=github-receive.zetaron.de"
+      - "ingress.targetport=80"
+
+volumes:
+  queue:
+    driver: local
+
+networks:
+  backend:
+    driver: overlay
+  frontends:
+    external:
+      name: frontends
