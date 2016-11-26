@@ -14,9 +14,9 @@
 // limitations under the License.
 //
 
-package main // import "github.com/zetaron/cutter/github-receive"
+package main // import "github.com/zetaron/github-hook-receiver"
 
-import "github.com/zetaron/cutter/github-receive/cmd"
+import "github.com/zetaron/github-hook-receiver/cmd"
 
 func main() {
 	cmd.Execute()

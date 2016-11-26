@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  queue:
+    extends:
+      file: docker-compose.yml
+      service: queue
+  github-hook-receiver:
+    extends:
+      file: docker-compose.yml
+      service: github-hook-receiver
+    build:
+      context: .
+      dockerfile: Dockerfile.onbuild
+    env_file:
+      - github-secret.env
+    labels:
+      - "ingress.dnsname=github-hook-receiver.docker"
