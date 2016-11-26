@@ -1,4 +1,4 @@
-FROM scratch
+FROM alpine:3.4
 
 CMD ["/usr/bin/secret-wrapper", "/usr/bin/github-hook-receiver"]
 LABEL org.label-schema.schema-version="1.0" \
