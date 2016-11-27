@@ -20,7 +20,7 @@ services:
       - backend
     labels:
       - "ingress=true"
-      - "ingress.dnsname=github-receive.zetaron.de"
+      - "ingress.dnsname=$INGRESS_DNSNAME"
       - "ingress.targetport=80"
 
 volumes:
@@ -28,7 +28,7 @@ volumes:
     driver: local
   secrets:
     external:
-      name: github-hook-receiver-secrets
+      name: $GITHUB_HOOK_RECEIVER_SECRETS_VOLUME_NAME
 
 networks:
   backend:
