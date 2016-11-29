@@ -1,0 +1,43 @@
+#!/bin/sh
+set -ex
+
+DEPLOYMENT_ENVIRONMENT=${DEPLOYMENT_ENVIRONMENT:-production}
+DNSNAME=${GITHUB_HOOK_RECEIVER_DNSNAME:-github-hook-receiver.zetaron.de}
+GITHUB_HOOK_RECEIVER_VERSION=${GITHUB_HOOK_RECEIVER_VERSION:-1.0.0}
+GITHUB_HOOK_RECEIVER_REPLICAS=${GITHUB_HOOK_RECEIVER_REPLICAS:-1}
+SCHEDULE_ONTO_NODE=${SCHEDULE_ONTO_NODE:-"cluster-node-1"}
+
+if [ "$(docker volume ls -q | grep "github-hook-receiver-secrets")" == "" ]
+then
+    docker volume create \
+           --name github-hook-receiver-secrets
+fi
+
+if [ "$(docker network ls -q --filter name=deployment-queue-backend)" == "" ]
+then
+    docker network create \
+           --driver overlay \
+           deployment-queue-backend
+fi
+
+if [ "$(docker service ls -q --filter name=github-hook-receiver)" == "" ]
+then
+    docker service create \
+           --name github-hook-receiver \
+           --network frontends \
+           --network deployment-queue-backend \
+           --mount type=volume,source=github-hook-receiver-secrets,destination=/var/cache/secrets \
+           --env REDIS_URL=deployment-queue:6379 \
+           --replicas $GITHUB_HOOK_RECEIVER_REPLICAS \
+           --label ingress=true \
+           --label ingress.dnsname=$DNSNAME \
+           --label ingress.targetport=80 \
+           --constraint "node.hostname == ${SCHEDULE_ONTO_NODE}" \
+           zetaron/github-hook-receiver:$GITHUB_HOOK_RECEIVER_VERSION
+else
+    docker service update \
+           --image zetaron/github-hook-receiver:$GITHUB_HOOK_RECEIVER_VERSION \
+           --label-add ingress.dnsname=$DNSNAME \
+           --replicas $GITHUB_HOOK_RECEIVER_REPLICAS \
+           github-hook-receiver
+fi
