@@ -37,14 +37,15 @@ var version = "1.0.0"
 
 // RootCmd : This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "github-receive",
+	Use:   "github-hook-receiver",
 	Short: "Collects hooks from GitHub.",
 	Long:  `Receives valid hooks from GitHub and published the payload to the queue to be processed by the queue-workers.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		viper.SetDefault("redis.url", "redis:6379")
 		viper.SetDefault("redis.database", 1)
+		viper.SetDefault("host", ":80")
 
-		log.Infof("Starting github-receive version: %s", version)
+		log.Infof("Starting github-hook-receiver version: %s", version)
 
 		if !viper.IsSet("github.secret") {
 			log.Fatal("No GitHub secret defined.")

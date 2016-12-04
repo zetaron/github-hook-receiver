@@ -1,7 +1,7 @@
 # GitHub Hook receiver
 Starts a server on given `$HOST`.
 
-Listenes for incomming requests on `/deployment` verifying the `$GITHUB_SECRET` and writing the received payload into the given redis database (`$REDIS_DATABASE`)
+Listenes for incomming requests on `/deployment` verifying the `$GITHUB_SECRET` and writing the received payload into the given redis database (`$REDIS_DATABASE`).
 To do something with these payloads please reffer to [deployment-queue-worker](https://github.com/zetaron/deployment-queue-worker)
 
 When you mount a volume to `/var/cache/secrets` the entrypoint script will create environment variables for each file in there, this way you dont need to expose your secrets to the image.
@@ -19,7 +19,7 @@ With `docker swarm` (reccomended for production):
 ```
 
 ## Configuration
-The image ships with a [`secret-wrapper`](https://github.com/zetaron/github-hook-receiver/blob/master/secret-wrapper) which allows you to automatically configure your container instance - not the System Environment, except if you are deploying through the `deployment-queue-worker` and the used `WORKER_IMAGE` supports it.
+The image ships with a [`secret-wrapper`](https://github.com/zetaron/github-hook-receiver/blob/master/secret-wrapper) which allows you to automatically configure your container instance - not the System Environment, except if you are deploying through the `deployment-queue-worker`.
 
 System Environment Variables when using `docker-compose`:
 - **GITHUB_HOOK_RECEIVER_SECRETS_VOLUME_NAME**
@@ -33,7 +33,7 @@ System Environment Variables when using `docker swarm`:
 - **SCHEDULE_ONTO_NODE** [default=cluster-node-1]
 
 Container Environment Variables:
-- **GITHUB_SECRET**
-- **REDIS_URL**
-- **REDIS_DATABASE**
-- **HOST**
+- **GITHUB_SECRET** [required]
+- **REDIS_URL** [default=redis:6379]
+- **REDIS_DATABASE** [default=1]
+- **HOST** [default=:80]
